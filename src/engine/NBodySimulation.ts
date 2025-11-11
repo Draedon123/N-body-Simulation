@@ -1,5 +1,5 @@
 import { SingleObjectScene } from "./SingleObjectScene";
-import { BallPhysicsShader } from "./PhysicsShader";
+import { PhysicsShader } from "./PhysicsShader";
 import { Sphere } from "./meshes/Sphere";
 import { Scene } from "./Scene";
 import { Model } from "./meshes/Model";
@@ -15,7 +15,7 @@ class NBodySimulation {
 
   private initialised: boolean;
 
-  public physicsShader!: BallPhysicsShader;
+  public physicsShader!: PhysicsShader;
   constructor(options: Partial<NBodyOptions> = {}) {
     this.initialised = false;
 
@@ -42,7 +42,7 @@ class NBodySimulation {
 
     this.scene.initialise(device);
     this.bodies.initialise(this.scene, device);
-    this.physicsShader = await BallPhysicsShader.create(device, this);
+    this.physicsShader = await PhysicsShader.create(device, this);
 
     this.initialised = true;
   }

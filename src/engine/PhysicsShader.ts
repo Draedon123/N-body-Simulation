@@ -8,11 +8,12 @@ import { Shader } from "./Shader";
 class PhysicsShader {
   private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(1 * 4, 16);
 
-  public readonly settingsBuffer: GPUBuffer;
-
   private readonly simulation: NBodySimulation;
   private readonly device: GPUDevice;
   private readonly gpuTimer: GPUTimer;
+
+  private readonly settingsBuffer: GPUBuffer;
+  private readonly bodyStatesBuffer: GPUBuffer;
 
   private readonly bindGroup: GPUBindGroup;
   private readonly computePipeline: GPUComputePipeline;
@@ -40,40 +41,64 @@ class PhysicsShader {
     });
 
     this.settingsBuffer = device.createBuffer({
-      label: "Ball Physics Shader Settings Buffer",
+      label: "Physics Shader Settings Buffer",
       size: PhysicsShader.SETTINGS_BYTE_LENGTH,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
+    this.bodyStatesBuffer = device.createBuffer({
+      label: "Physics Shader Body States Buffer",
+      size: this.simulation.bodyCount * 4 * 4,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+
     const mainBindGroupLayout = device.createBindGroupLayout({
-      label: "Ball Physics Shader Bind Group Layout",
+      label: "Physics Shader Bind Group Layout",
       entries: [
         {
           binding: 0,
           buffer: { type: "uniform" },
           visibility: GPUShaderStage.COMPUTE,
         },
+        {
+          binding: 1,
+          buffer: { type: "storage" },
+          visibility: GPUShaderStage.COMPUTE,
+        },
+        {
+          binding: 2,
+          buffer: { type: "storage" },
+          visibility: GPUShaderStage.COMPUTE,
+        },
       ],
     });
 
     this.bindGroup = device.createBindGroup({
-      label: "Ball Physics Shader Bind Group",
+      label: "Physics Shader Bind Group",
       layout: mainBindGroupLayout,
       entries: [
         {
           binding: 0,
           resource: { buffer: this.settingsBuffer },
         },
+        {
+          binding: 1,
+          resource: { buffer: this.simulation.scene.sceneBuffer },
+        },
+        {
+          binding: 2,
+          resource: { buffer: this.bodyStatesBuffer },
+        },
       ],
     });
 
     const pipelineLayout = device.createPipelineLayout({
-      label: "Ball Physics Shader Compute Pipeline Layout",
+      label: "Physics Shader Compute Pipeline Layout",
       bindGroupLayouts: [mainBindGroupLayout],
     });
 
     this.computePipeline = device.createComputePipeline({
-      label: "Ball Physics Shader Compute Pipeline",
+      label: "Physics Shader Compute Pipeline",
       layout: pipelineLayout,
       compute: {
         module: shader.shader,
@@ -84,8 +109,8 @@ class PhysicsShader {
   private updateSettings(deltaTimeMs: number): void {
     const settings = new BufferWriter(PhysicsShader.SETTINGS_BYTE_LENGTH);
 
-    settings.writeFloat32(deltaTimeMs);
     settings.writeUint32(this.simulation.bodyCount);
+    settings.writeFloat32(deltaTimeMs);
 
     this.device.queue.writeBuffer(this.settingsBuffer, 0, settings.buffer);
   }
@@ -95,7 +120,7 @@ class PhysicsShader {
 
     const commandEncoder = this.device.createCommandEncoder();
     const computePass = this.gpuTimer.beginComputePass(commandEncoder, {
-      label: "Ball Physics Shader Compute Pass",
+      label: "Physics Shader Compute Pass",
     });
 
     computePass.setBindGroup(0, this.bindGroup);
@@ -122,4 +147,4 @@ class PhysicsShader {
   }
 }
 
-export { PhysicsShader as BallPhysicsShader };
+export { PhysicsShader };

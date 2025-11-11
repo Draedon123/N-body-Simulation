@@ -31,6 +31,7 @@ async function main(): Promise<void> {
   const loop = new Loop({ wormholeThreshold: 100 });
   loop.addCallback((frame) => {
     renderer.camera.checkKeyboardInputs(frame.deltaTime);
+    simulation.tick(frame.deltaTime);
     renderer.render();
   });
 
