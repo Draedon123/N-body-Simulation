@@ -48,6 +48,6 @@ fn fragmentMain(vertex: VertexOutput) -> @location(0) vec4f {
   let ambient: vec3f = AMBIENT_STRENGTH * AMBIENT_COLOUR;
   let skyboxColour: vec3f = textureSample(skybox, textureSampler, vertex.normal).xyz;
 
-  return vec4f(diffuse + ambient + 0.5 * skyboxColour, 1.0);
+  return vec4f(diffuse + ambient + 0.25 * skyboxColour, 1.0);
   // return vec4f((vertex.normal + 1.0) / 2.0, 1.0);
 }
