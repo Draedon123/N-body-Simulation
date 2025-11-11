@@ -12,3 +12,4 @@ A simulation of the n-body problem
 - [glmatrix](https://github.com/toji/gl-matrix)
 - [Skybox Texture](https://www.eso.org/public/images/eso0932a/)
 - [Panorama to Cubemap](https://jaxry.github.io/panorama-to-cubemap/)
+- [Gravitational Constant](https://en.wikipedia.org/wiki/Gravitational_constant)

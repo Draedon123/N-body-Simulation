@@ -10,7 +10,7 @@ async function main(): Promise<void> {
   message.style.zIndex = "2";
 
   const canvas = document.getElementById("main") as HTMLCanvasElement;
-  const simulation = new NBodySimulation();
+  const simulation = new NBodySimulation({ bodyCount: 50 });
 
   const renderer = await Renderer.create(canvas, {
     scene: simulation.scene,

@@ -2,8 +2,8 @@ import { SingleObjectScene } from "./SingleObjectScene";
 import { PhysicsShader } from "./PhysicsShader";
 import { Sphere } from "./meshes/Sphere";
 import { Scene } from "./Scene";
-import { Model } from "./meshes/Model";
 import { Vector3 } from "../utils/Vector3";
+import { Body } from "./Body";
 
 type NBodyOptions = {
   bodyCount: number;
@@ -13,9 +13,10 @@ type NBodyOptions = {
 
 class NBodySimulation {
   public readonly scene: Scene;
-  public readonly bodies: SingleObjectScene;
   public readonly bodyCount: number;
+  public readonly bodies: Body[];
 
+  private readonly bodyScene: SingleObjectScene;
   private readonly bodyRadius: number;
   private readonly bodySpawnRadius: number;
 
@@ -25,20 +26,19 @@ class NBodySimulation {
   constructor(options: Partial<NBodyOptions> = {}) {
     this.initialised = false;
 
+    this.bodies = [];
     this.bodyCount = options.bodyCount ?? 10;
     this.bodyRadius = options.bodyRadius ?? 1;
     this.bodySpawnRadius =
-      options.bodySpawnRadius ?? 3 * this.bodyRadius * this.bodyCount;
-    this.bodies = new SingleObjectScene(new Sphere(9, this.bodyRadius));
+      options.bodySpawnRadius ?? 1.5 * this.bodyRadius * this.bodyCount;
 
+    this.bodyScene = new SingleObjectScene(new Sphere(9, this.bodyRadius));
     this.scene = new Scene(1, this.bodyCount);
 
     this.spawnBodies();
   }
 
   private spawnBodies(): void {
-    const bodies: Model[] = [];
-
     for (let i = 0; i < this.bodyCount; i++) {
       let position = Vector3.random(
         -this.bodySpawnRadius,
@@ -46,7 +46,7 @@ class NBodySimulation {
       );
 
       while (
-        bodies.some(
+        this.bodies.some(
           (body) =>
             Vector3.subtract(body.position, position).magnitude <=
             2 * this.bodyRadius
@@ -55,10 +55,10 @@ class NBodySimulation {
         position = Vector3.random(-this.bodySpawnRadius, this.bodySpawnRadius);
       }
 
-      bodies.push(new Model({ position }));
+      this.bodies.push(new Body(position, this.bodyRadius));
     }
 
-    this.bodies.addObjects(bodies);
+    this.bodyScene.addObjects(this.bodies);
   }
 
   public tick(deltaTimeMs: number): void {
@@ -75,7 +75,7 @@ class NBodySimulation {
     }
 
     this.scene.initialise(device);
-    this.bodies.initialise(this.scene, device);
+    this.bodyScene.initialise(this.scene, device);
     this.physicsShader = await PhysicsShader.create(device, this);
 
     this.initialised = true;

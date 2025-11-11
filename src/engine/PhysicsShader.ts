@@ -2,11 +2,12 @@ import { BufferWriter } from "../utils/BufferWriter";
 import { GPUTimer } from "../utils/GPUTimer";
 import { resolveBasePath } from "../utils/resolveBasePath";
 import { roundUp } from "../utils/roundUp";
+import { Body } from "./Body";
 import type { NBodySimulation } from "./NBodySimulation";
 import { Shader } from "./Shader";
 
 class PhysicsShader {
-  private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(1 * 4, 16);
+  private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(2 * 4, 16);
 
   private readonly simulation: NBodySimulation;
   private readonly device: GPUDevice;
@@ -48,9 +49,19 @@ class PhysicsShader {
 
     this.bodyStatesBuffer = device.createBuffer({
       label: "Physics Shader Body States Buffer",
-      size: this.simulation.bodyCount * 4 * 4,
+      size: this.simulation.bodyCount * Body.BYTE_LENGTH,
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
+
+    const bodyStates = new BufferWriter(
+      this.simulation.bodyCount * Body.BYTE_LENGTH
+    );
+
+    for (const body of this.simulation.bodies) {
+      body.writeToBuffer(bodyStates, 1e13);
+    }
+
+    this.device.queue.writeBuffer(this.bodyStatesBuffer, 0, bodyStates.buffer);
 
     const mainBindGroupLayout = device.createBindGroupLayout({
       label: "Physics Shader Bind Group Layout",
