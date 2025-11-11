@@ -1,0 +1,125 @@
+import { BufferWriter } from "../utils/BufferWriter";
+import { GPUTimer } from "../utils/GPUTimer";
+import { resolveBasePath } from "../utils/resolveBasePath";
+import { roundUp } from "../utils/roundUp";
+import type { NBodySimulation } from "./NBodySimulation";
+import { Shader } from "./Shader";
+
+class PhysicsShader {
+  private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(1 * 4, 16);
+
+  public readonly settingsBuffer: GPUBuffer;
+
+  private readonly simulation: NBodySimulation;
+  private readonly device: GPUDevice;
+  private readonly gpuTimer: GPUTimer;
+
+  private readonly bindGroup: GPUBindGroup;
+  private readonly computePipeline: GPUComputePipeline;
+
+  constructor(shader: Shader, device: GPUDevice, simulation: NBodySimulation) {
+    this.device = device;
+    this.simulation = simulation;
+
+    const frameTimeElement = document.getElementById(
+      "computeFrameTime"
+    ) as HTMLElement;
+
+    this.gpuTimer = new GPUTimer(device, (time) => {
+      const microseconds = time / 1e3;
+      const milliseconds = time / 1e6;
+      const useMilliseconds = milliseconds > 1;
+      const displayTime = (
+        useMilliseconds ? milliseconds : microseconds
+      ).toFixed(2);
+      const prefix = useMilliseconds ? "ms" : "μs";
+
+      const frameTime = displayTime + prefix;
+
+      frameTimeElement.textContent = frameTime;
+    });
+
+    this.settingsBuffer = device.createBuffer({
+      label: "Ball Physics Shader Settings Buffer",
+      size: PhysicsShader.SETTINGS_BYTE_LENGTH,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
+
+    const mainBindGroupLayout = device.createBindGroupLayout({
+      label: "Ball Physics Shader Bind Group Layout",
+      entries: [
+        {
+          binding: 0,
+          buffer: { type: "uniform" },
+          visibility: GPUShaderStage.COMPUTE,
+        },
+      ],
+    });
+
+    this.bindGroup = device.createBindGroup({
+      label: "Ball Physics Shader Bind Group",
+      layout: mainBindGroupLayout,
+      entries: [
+        {
+          binding: 0,
+          resource: { buffer: this.settingsBuffer },
+        },
+      ],
+    });
+
+    const pipelineLayout = device.createPipelineLayout({
+      label: "Ball Physics Shader Compute Pipeline Layout",
+      bindGroupLayouts: [mainBindGroupLayout],
+    });
+
+    this.computePipeline = device.createComputePipeline({
+      label: "Ball Physics Shader Compute Pipeline",
+      layout: pipelineLayout,
+      compute: {
+        module: shader.shader,
+      },
+    });
+  }
+
+  private updateSettings(deltaTimeMs: number): void {
+    const settings = new BufferWriter(PhysicsShader.SETTINGS_BYTE_LENGTH);
+
+    settings.writeFloat32(deltaTimeMs);
+    settings.writeUint32(this.simulation.bodyCount);
+
+    this.device.queue.writeBuffer(this.settingsBuffer, 0, settings.buffer);
+  }
+
+  public run(deltaTimeMs: number): void {
+    this.updateSettings(deltaTimeMs);
+
+    const commandEncoder = this.device.createCommandEncoder();
+    const computePass = this.gpuTimer.beginComputePass(commandEncoder, {
+      label: "Ball Physics Shader Compute Pass",
+    });
+
+    computePass.setBindGroup(0, this.bindGroup);
+    computePass.setPipeline(this.computePipeline);
+    computePass.dispatchWorkgroups(
+      Math.ceil(this.simulation.bodyCount / 64),
+      1,
+      1
+    );
+    computePass.end();
+
+    this.device.queue.submit([commandEncoder.finish()]);
+  }
+
+  public static async create(
+    device: GPUDevice,
+    simulation: NBodySimulation
+  ): Promise<PhysicsShader> {
+    const shaderModule = await Shader.fetch(
+      device,
+      resolveBasePath("shaders/physics.wgsl")
+    );
+    return new PhysicsShader(shaderModule, device, simulation);
+  }
+}
+
+export { PhysicsShader as BallPhysicsShader };

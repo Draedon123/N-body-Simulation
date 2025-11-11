@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>N-body Simulation</title>
+    <script type="module" crossorigin src="/N-body-Simulation/assets/index-DU2ZKPGh.js"></script>
+    <link rel="stylesheet" crossorigin href="/N-body-Simulation/assets/index-M80NwL3r.css">
+  </head>
+  <body>
+    <div id="alert">
+      <span id="message"
+        >Loading...
+        <br />
+        <small>This can take a few seconds</small>
+      </span>
+      <br />
+      <iframe class="hidden"></iframe>
+    </div>
+    <div id="info">
+      <h1>Info Panel</h1>
+      <input type="image" id="chevron" src="down-chevron.png" />
+      <div id="content">
+        Compute Frame Time: <span id="computeFrameTime"></span>
+        <br />
+        Render Frame Time: <span id="renderFrameTime"></span>
+        <br />
+        FPS: <span id="fps"></span>
+        <br />
+        <br />
+        Use WASD to move, Space to ascend, and Shift to descend
+        <br />
+        Mouse to rotate camera (click to lock cursor)
+      </div>
+    </div>
+    <canvas id="main"></canvas>
+
+  </body>
+</html>
