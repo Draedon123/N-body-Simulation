@@ -31,5 +31,5 @@ fn vertexMain(vertex: Vertex) -> VertexOutput {
 fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
   let transformed: vec4f = inversePerspectiveViewMatrix * input.fragmentPosition;
 
-  return textureSample(texture, textureSampler, normalize(transformed.xyz / transformed.w) * vec3f(1.0, 1.0, -1.0));
+  return textureSample(texture, textureSampler, normalize(transformed.xyz / transformed.w));
 }
