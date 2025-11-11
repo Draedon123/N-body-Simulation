@@ -21,7 +21,6 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   var position: vec3f = extractPosition(&objects[index].modelMatrix);
   let deltaTime: f32 = settings.deltaTimeMs / 1000.0;
 
-  bodies[index].acceleration = vec3f(0.0, -0.3, 0.0);
   bodies[index].velocity += bodies[index].acceleration * deltaTime;
   position += bodies[index].velocity * deltaTime;
 

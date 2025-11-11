@@ -23,7 +23,7 @@ async function main(): Promise<void> {
   await simulation.initialise(renderer.device);
   await renderer.initialise();
 
-  renderer.camera.position = new Vector3(3, 3, 3);
+  renderer.camera.position = new Vector3(30, 30, 30);
   renderer.camera.lookAt(new Vector3(0, 0, 0));
 
   initialiseConfigPanel(renderer);

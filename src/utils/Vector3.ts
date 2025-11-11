@@ -4,6 +4,16 @@ class Vector3 {
     this.components = new Float32Array([x, y, z]);
   }
 
+  public static random(min: number, max: number): Vector3 {
+    const range = max - min;
+
+    return new Vector3(
+      range * Math.random() + min,
+      range * Math.random() + min,
+      range * Math.random() + min
+    );
+  }
+
   public static cross(a: Vector3, b: Vector3): Vector3 {
     const ax = a.components[0];
     const ay = a.components[1];
