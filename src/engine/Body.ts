@@ -3,9 +3,10 @@ import { Vector3 } from "../utils/Vector3";
 import { Model } from "./meshes/Model";
 
 class Body extends Model {
-  public static readonly BYTE_LENGTH: number = 4 * 4;
+  public static readonly BYTE_LENGTH: number = 8 * 4;
 
   private readonly mass: number;
+  private readonly radius: number;
   private readonly initialVelocity: Vector3;
   constructor(
     position: Vector3,
@@ -19,12 +20,15 @@ class Body extends Model {
     });
 
     this.mass = mass;
+    this.radius = radius;
     this.initialVelocity = initialVelocity;
   }
 
   public writeToBuffer(buffer: BufferWriter): void {
     buffer.writeVec3f(this.initialVelocity);
     buffer.writeFloat32(this.mass);
+    buffer.writeFloat32(this.radius);
+    buffer.pad(3 * 4);
   }
 }
 

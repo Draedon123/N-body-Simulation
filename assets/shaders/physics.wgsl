@@ -4,6 +4,7 @@
 struct BodyState {
   velocity: vec3f,
   mass: f32,
+  radius: f32,
 }
 
 @group(0) @binding(0) var <uniform> settings: PhysicsSettings;
@@ -11,6 +12,7 @@ struct BodyState {
 @group(0) @binding(2) var <storage, read_write> bodies: array<BodyState>;
 
 const G: f32 = 6.6743e-11;
+const RESTITUTION: f32 = 1.0;
 
 @compute
 @workgroup_size(64, 1, 1)
@@ -25,6 +27,25 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
 
   bodies[index].velocity = rkf45(bodies[index].velocity, 0.0, deltaTime, vec3f(1e-7), vec3f(5e-3), index, 1);
   position = rkf45(position, 0.0, deltaTime, vec3f(1e-7), vec3f(5e-3), index, 0);
+
+  for(var i: u32 = 0; i < settings.bodyCount; i++){
+    if(i == index){
+      continue;
+    }
+
+    let bodyPosition: vec3f = extractPosition(&objects[i].modelMatrix);
+    let toBody: vec3f = bodyPosition - position;
+    let collisionNormal = normalize(toBody);
+    let distanceBetweenCentres: f32 = length(toBody);
+    let radiusSum: f32 = bodies[i].radius + bodies[index].radius;
+
+    if(distanceBetweenCentres - radiusSum <= 0.0){
+      bodies[index].velocity -= (1.0 + RESTITUTION) * collisionNormal * max(0.0, dot(collisionNormal, bodies[index].velocity));
+      position = bodyPosition - collisionNormal * radiusSum;
+
+      break;
+    }
+  }
 
   setPosition(&objects[index].modelMatrix, position);
 }
@@ -47,7 +68,7 @@ fn derivative(derivativeFunction: u32, index: u32, t: f32, state: vec3f) -> vec3
 
         let toBody: vec3f = extractPosition(&objects[i].modelMatrix) - position;
         // g = GM / r ^ 2
-        gravitationalFieldStrength += normalize(toBody) * bodies[i].mass / dot(toBody, toBody);
+        gravitationalFieldStrength += normalize(toBody) * bodies[i].mass / max((bodies[index].radius + bodies[i].radius) * (bodies[index].radius + bodies[i].radius), dot(toBody, toBody));
       }
 
       // factor out G from Newton's Universal Law of Gravitation
