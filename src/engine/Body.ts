@@ -17,6 +17,7 @@ class Body extends Model {
     super({
       position,
       scale: new Vector3(radius, radius, radius),
+      colour: new Vector3(0.5, 0.25, 0),
     });
 
     this.mass = mass;
