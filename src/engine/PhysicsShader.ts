@@ -58,7 +58,7 @@ class PhysicsShader {
     );
 
     for (const body of this.simulation.bodies) {
-      body.writeToBuffer(bodyStates, 1e13);
+      body.writeToBuffer(bodyStates);
     }
 
     this.device.queue.writeBuffer(this.bodyStatesBuffer, 0, bodyStates.buffer);

@@ -55,7 +55,9 @@ class NBodySimulation {
         position = Vector3.random(-this.bodySpawnRadius, this.bodySpawnRadius);
       }
 
-      this.bodies.push(new Body(position, this.bodyRadius));
+      const velocity = Vector3.random(-1, 1).scale(5 * this.bodyRadius);
+
+      this.bodies.push(new Body(position, this.bodyRadius, 1e13, velocity));
     }
 
     this.bodyScene.addObjects(this.bodies);
