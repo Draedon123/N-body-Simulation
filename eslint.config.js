@@ -19,7 +19,9 @@ export default [
     },
   },
   {
+    files: ["**/*.ts"],
+  },
+  {
     ignores: ["build/"],
-    files: ["src/**/*.ts"],
   },
 ];
