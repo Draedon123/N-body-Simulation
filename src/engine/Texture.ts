@@ -8,7 +8,7 @@ class Texture {
     this.texture = texture;
   }
 
-  private static fromSources(
+  protected static fromSources(
     device: GPUDevice,
     label: string,
     sources: GPUCopyExternalImageSource[],
@@ -46,7 +46,7 @@ class Texture {
     return new Texture(label, texture);
   }
 
-  private static async toBitmap(urls: string[]): Promise<ImageBitmap[]> {
+  protected static async toBitmap(urls: string[]): Promise<ImageBitmap[]> {
     const requests = urls.map(
       async (url) => await (await fetch(resolveBasePath(url))).blob()
     );
@@ -71,56 +71,6 @@ class Texture {
       sources,
       sources[0].width,
       sources[1].height
-    );
-  }
-
-  /** assumes textures have the same dimensions */
-  public static async createTextureAtlas(
-    device: GPUDevice,
-    label: string,
-    ...urls: string[]
-  ): Promise<Texture> {
-    const sources = await Texture.toBitmap(urls);
-
-    const maxSize = device.limits.maxTextureDimension2D;
-    const columns = Math.min(
-      Math.floor(maxSize / sources[0].width),
-      sources.length
-    );
-    const rows = Math.ceil(sources.length / columns);
-    const textureWidth = columns * sources[0].width;
-    const textureHeight = rows * sources[0].height;
-
-    if (textureWidth > maxSize || textureHeight > maxSize) {
-      throw new Error(
-        `Texture atlas size exceeds maximum dimensions (${maxSize}x${maxSize}px)`
-      );
-    }
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-    canvas.width = textureWidth;
-    canvas.height = textureHeight;
-
-    for (let i = 0; i < sources.length; i++) {
-      const source = sources[i];
-
-      const column = i % columns;
-      const row = Math.floor(i / columns);
-
-      const x = (column * textureWidth) / i;
-      const y = (row * textureHeight) / i;
-
-      ctx.drawImage(source, x, y);
-    }
-
-    return Texture.fromSources(
-      device,
-      label,
-      [canvas],
-      textureWidth,
-      textureHeight
     );
   }
 
