@@ -203,7 +203,7 @@ class Renderer {
         {
           binding: 6,
           buffer: { type: "uniform" },
-          visibility: GPUShaderStage.FRAGMENT,
+          visibility: GPUShaderStage.VERTEX,
         },
       ],
     });

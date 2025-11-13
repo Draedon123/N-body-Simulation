@@ -45,16 +45,26 @@ fn vertexMain(vertex: Vertex) -> VertexOutput {
 
   output.position = perspectiveViewMatrix * object.modelMatrix * vec4f(vertex.position, 1.0);
   output.normal = vertex.normal;
-  output.uv = vertex.uv;
+  output.uv = 
+    vertex.uv / 
+    vec2f(
+      f32(textureAtlasData.columns),
+      f32(textureAtlasData.rows)
+    ) +
+    vec2f(
+      f32(object.textureID % textureAtlasData.columns),
+      f32(object.textureID / textureAtlasData.columns)
+    );
 
   return output;
 }
 
 @fragment
 fn fragmentMain(vertex: VertexOutput) -> @location(0) vec4f {
+  let textureColour = textureSample(textureAtlas, textureSampler, vertex.uv);
   let diffuseStrength_1: f32 = max(dot(vertex.normal, LIGHT_DIRECTION_1), 0.0);
   let diffuseStrength_2: f32 = max(dot(vertex.normal, LIGHT_DIRECTION_2), 0.0);
-  let diffuse: vec3f = vec3f(min(0.75 * (diffuseStrength_1 + diffuseStrength_2), 1.0));
+  let diffuse: vec3f = min(0.75 * (diffuseStrength_1 + diffuseStrength_2), 1.0) * textureColour.rgb;
   let ambient: vec3f = AMBIENT_STRENGTH * AMBIENT_COLOUR;
   let skyboxColour: vec3f = textureSample(skybox, textureSampler, vertex.normal).xyz;
 
