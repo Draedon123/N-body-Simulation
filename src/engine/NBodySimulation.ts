@@ -105,6 +105,10 @@ class NBodySimulation {
     this.bodyScene.initialise(this.scene, device);
     this.physicsShader = await PhysicsShader.create(device, this);
 
+    for (const body of this.bodies) {
+      body.textureID = textureAtlas.random();
+    }
+
     this.initialised = true;
   }
 }

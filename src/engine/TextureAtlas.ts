@@ -3,8 +3,10 @@ import { Texture } from "./Texture";
 class TextureAtlas extends Texture {
   public readonly columns: number;
   public readonly rows: number;
+  public readonly textureCount: number;
 
   constructor(
+    texureCount: number,
     columns: number,
     rows: number,
     label: string,
@@ -12,8 +14,13 @@ class TextureAtlas extends Texture {
   ) {
     super(label, texture);
 
+    this.textureCount = texureCount;
     this.columns = columns;
     this.rows = rows;
+  }
+
+  public random(): number {
+    return Math.floor(Math.random() * this.textureCount);
   }
 
   /** assumes textures have the same dimensions */
@@ -62,6 +69,7 @@ class TextureAtlas extends Texture {
     }
 
     return new TextureAtlas(
+      sources.length,
       columns,
       rows,
       label,
