@@ -61,11 +61,10 @@ class SingleObjectScene {
       i++
     ) {
       const object = this.objects[i];
-      const modelMatrix = object.calculateModelMatrix();
 
-      bufferWriter.writeMat4x4f(modelMatrix);
-      bufferWriter.writeVec3f(object.colour);
-      bufferWriter.pad(4);
+      bufferWriter.writeMat4x4f(object.calculateModelMatrix());
+      bufferWriter.writeUint32(object.textureID);
+      bufferWriter.pad(12);
     }
 
     this.device.queue.writeBuffer(
@@ -135,7 +134,7 @@ class SingleObjectScene {
   }
 
   public static get objectByteLength(): number {
-    return (16 + 4) * 4;
+    return (16 + 4 + 12) * 4;
   }
 }
 

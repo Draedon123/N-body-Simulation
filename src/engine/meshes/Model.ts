@@ -6,21 +6,20 @@ type ModelOptions = {
   position: Vector3;
   // rotation: Quaternion;
   scale: Vector3;
-  /** 0-1 */
-  colour: Vector3;
+  textureID: number;
 };
 
 class Model {
   public position: Vector3;
   // public rotation: Quaternion;
   public scale: Vector3;
-  public colour: Vector3;
+  public textureID: number;
 
-  constructor(transforms: Partial<ModelOptions> = {}) {
-    this.position = transforms.position ?? new Vector3();
+  constructor(options: Partial<ModelOptions> = {}) {
+    this.position = options.position ?? new Vector3();
     // this.rotation = transforms.rotation ?? new Quaternion();
-    this.scale = transforms.scale ?? new Vector3(1, 1, 1);
-    this.colour = transforms.colour ?? new Vector3(1, 1, 1);
+    this.scale = options.scale ?? new Vector3(1, 1, 1);
+    this.textureID = options.textureID ?? 0;
   }
 
   public calculateModelMatrix(): Matrix4 {

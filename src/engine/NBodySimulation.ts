@@ -4,6 +4,7 @@ import { Sphere } from "./meshes/Sphere";
 import { Scene } from "./Scene";
 import { Vector3 } from "../utils/Vector3";
 import { Body } from "./Body";
+import { TextureAtlas } from "./TextureAtlas";
 
 type NBodyOptions = {
   bodyCount: number;
@@ -12,7 +13,8 @@ type NBodyOptions = {
 };
 
 class NBodySimulation {
-  public readonly scene: Scene;
+  public scene!: Scene;
+
   public readonly bodyCount: number;
   public readonly bodies: Body[];
 
@@ -33,7 +35,6 @@ class NBodySimulation {
       options.bodySpawnRadius ?? 1.5 * this.bodyRadius * this.bodyCount;
 
     this.bodyScene = new SingleObjectScene(new Sphere(9, this.bodyRadius));
-    this.scene = new Scene(1, this.bodyCount);
 
     this.spawnBodies();
   }
@@ -75,6 +76,30 @@ class NBodySimulation {
     if (this.initialised) {
       return;
     }
+
+    const textureAtlas = await TextureAtlas.create(
+      device,
+      "N-body Simulation Texture Atlas",
+      ...[
+        "Alpine",
+        "Gaseous1",
+        "Gaseous2",
+        "Gaseous3",
+        "Gaseous4",
+        "Icy",
+        "Martian",
+        "Savannah",
+        "Swamp",
+        "Terrestrial1",
+        "Terrestrial2",
+        "Terrestrial3",
+        "Terrestrial4",
+        "Tropical",
+        "Venusian",
+        "Volcanic",
+      ].map((name) => `textures/${name}.png`)
+    );
+    this.scene = new Scene(textureAtlas, 1, this.bodyCount);
 
     this.scene.initialise(device);
     this.bodyScene.initialise(this.scene, device);

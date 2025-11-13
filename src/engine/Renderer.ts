@@ -10,13 +10,13 @@ import { SkyboxRenderer } from "./SkyboxRenderer";
 
 type RendererSettings = {
   cameraOptions?: Partial<CameraOptions>;
-  scene: Scene;
 };
 
 class Renderer {
+  public scenes!: Scene;
+
   public readonly canvas: HTMLCanvasElement;
   public readonly camera: Camera;
-  public readonly scenes: Scene;
   public readonly device: GPUDevice;
 
   private readonly ctx: GPUCanvasContext;
@@ -31,7 +31,7 @@ class Renderer {
 
   private skyboxRenderer!: SkyboxRenderer;
 
-  private readonly parametersBuffer!: GPUBuffer;
+  private parametersBuffer!: GPUBuffer;
   private readonly perspectiveViewMatrix: Matrix4Buffer;
 
   private constructor(
@@ -50,7 +50,6 @@ class Renderer {
     this.ctx = ctx;
     this.canvasFormat = "rgba8unorm";
     this.camera = new Camera(settings.cameraOptions);
-    this.scenes = settings.scene;
 
     const frameTimeElement = document.getElementById(
       "renderFrameTime"
@@ -76,12 +75,6 @@ class Renderer {
       fpsElement.textContent = "[Not supported by browser]";
     }
 
-    this.parametersBuffer = device.createBuffer({
-      label: "Parameters Buffer",
-      size: this.scenes.maxScenes * 256,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
     this.perspectiveViewMatrix = new Matrix4Buffer(
       device,
       "Perspective View Matrix"
@@ -90,10 +83,18 @@ class Renderer {
     this.initialised = false;
   }
 
-  public async initialise(): Promise<void> {
+  public async initialise(scene: Scene): Promise<void> {
     if (this.initialised) {
       return;
     }
+
+    this.scenes = scene;
+
+    this.parametersBuffer = this.device.createBuffer({
+      label: "Parameters Buffer",
+      size: this.scenes.maxScenes * 256,
+      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    });
 
     await this.initialiseRendering();
 
@@ -194,6 +195,16 @@ class Renderer {
           sampler: {},
           visibility: GPUShaderStage.FRAGMENT,
         },
+        {
+          binding: 5,
+          texture: {},
+          visibility: GPUShaderStage.FRAGMENT,
+        },
+        {
+          binding: 6,
+          buffer: { type: "uniform" },
+          visibility: GPUShaderStage.FRAGMENT,
+        },
       ],
     });
 
@@ -223,6 +234,14 @@ class Renderer {
           binding: 4,
           resource: this.skyboxRenderer.sampler,
         },
+        {
+          binding: 5,
+          resource: this.scenes.textureAtlas.texture,
+        },
+        {
+          binding: 6,
+          resource: this.scenes.textureAtlasDataBuffer,
+        },
       ],
     });
 
@@ -238,7 +257,7 @@ class Renderer {
         module: shader.shader,
         buffers: [
           {
-            arrayStride: 6 * 4,
+            arrayStride: (3 + 3 + 2) * 4,
             attributes: [
               // position
               {
@@ -251,6 +270,12 @@ class Renderer {
                 shaderLocation: 1,
                 format: "float32x3",
                 offset: 3 * 4,
+              },
+              // uv
+              {
+                shaderLocation: 2,
+                format: "float32x2",
+                offset: (3 + 3) * 4,
               },
             ],
           },
