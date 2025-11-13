@@ -149,7 +149,7 @@ class Renderer {
     const skybox = await Texture.createCubemap(
       this.device,
       "Skybox Texture",
-      "skybox"
+      "textures/skybox"
     );
 
     this.skyboxRenderer = await SkyboxRenderer.create(
