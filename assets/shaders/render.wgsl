@@ -45,16 +45,18 @@ fn vertexMain(vertex: Vertex) -> VertexOutput {
 
   output.position = perspectiveViewMatrix * object.modelMatrix * vec4f(vertex.position, 1.0);
   output.normal = vertex.normal;
-  output.uv = 
-    vertex.uv / 
-    vec2f(
-      f32(textureAtlasData.columns),
-      f32(textureAtlasData.rows)
-    ) +
-    vec2f(
-      f32(object.textureID % textureAtlasData.columns),
-      f32(object.textureID / textureAtlasData.columns)
-    );
+
+  let columns: f32 = f32(textureAtlasData.columns);
+  let rows: f32 = f32(textureAtlasData.rows);
+
+  let tileSize: vec2f = 1.0 / vec2f(columns, rows);
+
+  let tileX: f32 = f32(object.textureID % textureAtlasData.columns);
+  let tileY: f32 = f32(object.textureID / textureAtlasData.columns);
+
+  output.uv =
+    vertex.uv * tileSize +
+    vec2f(tileX, tileY) * tileSize;
 
   return output;
 }
@@ -68,6 +70,6 @@ fn fragmentMain(vertex: VertexOutput) -> @location(0) vec4f {
   let ambient: vec3f = AMBIENT_STRENGTH * AMBIENT_COLOUR;
   let skyboxColour: vec3f = textureSample(skybox, textureSampler, vertex.normal).xyz;
 
-  return vec4f(diffuse + ambient + 0.25 * skyboxColour, 1.0);
+  return vec4f(diffuse + ambient + 0.0 * skyboxColour, 1.0);
   // return vec4f((vertex.normal + 1.0) / 2.0, 1.0);
 }

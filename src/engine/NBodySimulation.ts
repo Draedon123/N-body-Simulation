@@ -34,7 +34,7 @@ class NBodySimulation {
     this.bodySpawnRadius =
       options.bodySpawnRadius ?? 1.5 * this.bodyRadius * this.bodyCount;
 
-    this.bodyScene = new SingleObjectScene(new Sphere(9, this.bodyRadius));
+    this.bodyScene = new SingleObjectScene(new Sphere(20, this.bodyRadius));
 
     this.spawnBodies();
   }
