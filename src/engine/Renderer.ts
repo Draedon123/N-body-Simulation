@@ -240,7 +240,7 @@ class Renderer {
         },
         {
           binding: 6,
-          resource: this.scenes.textureAtlasDataBuffer,
+          resource: { buffer: this.scenes.textureAtlasDataBuffer },
         },
       ],
     });
