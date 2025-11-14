@@ -31,15 +31,6 @@ class Sphere extends Cube {
       );
 
       vertex.normal = normal.normalise();
-
-      // equirectangular projection
-      const longitude = Math.atan2(normal.x, normal.z);
-      const latitude = Math.asin(normal.y);
-
-      const u = (longitude + Math.PI) / (2 * Math.PI);
-      const v = (latitude + Math.PI / 2) / Math.PI;
-
-      vertex.uv = [u, v];
     });
   }
 }

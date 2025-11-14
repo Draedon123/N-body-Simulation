@@ -4,7 +4,7 @@ import { Sphere } from "./meshes/Sphere";
 import { Scene } from "./Scene";
 import { Vector3 } from "../utils/Vector3";
 import { Body } from "./Body";
-import { TextureAtlas } from "./TextureAtlas";
+import { TextureArray } from "./TextureArray";
 
 type NBodyOptions = {
   bodyCount: number;
@@ -77,9 +77,9 @@ class NBodySimulation {
       return;
     }
 
-    const textureAtlas = await TextureAtlas.create(
+    const textureArray = await TextureArray.create(
       device,
-      "N-body Simulation Texture Atlas",
+      "N-body Simulation Texture Array",
       ...[
         "Alpine",
         "Gaseous1",
@@ -97,15 +97,15 @@ class NBodySimulation {
         "Tropical",
         "Venusian",
         "Volcanic",
-      ].map((name) => `textures/${name}.png`)
+      ].map((name) => `textures/${name}`)
     );
-    this.scene = new Scene(textureAtlas, 1, this.bodyCount);
+    this.scene = new Scene(textureArray, 1, this.bodyCount);
 
     this.scene.initialise(device);
     this.physicsShader = await PhysicsShader.create(device, this);
 
     for (const body of this.bodies) {
-      body.textureID = textureAtlas.random();
+      body.textureID = textureArray.random();
     }
 
     this.bodyScene.initialise(this.scene, device);

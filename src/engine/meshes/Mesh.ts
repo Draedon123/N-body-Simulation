@@ -3,7 +3,6 @@ import type { Vector3 } from "../../utils/Vector3";
 type Vertex = {
   position: Vector3;
   normal: Vector3;
-  uv: [number, number];
 };
 
 class Mesh {
@@ -51,8 +50,6 @@ class Mesh {
           vertex.normal.x,
           vertex.normal.y,
           vertex.normal.z,
-          vertex.uv[0],
-          vertex.uv[1],
         ])
         .flat()
     );

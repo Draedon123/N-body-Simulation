@@ -90,6 +90,33 @@ class Texture {
       `${textureDirectory}/nz.png`
     );
   }
+
+  public static async createCubeArray(
+    device: GPUDevice,
+    label: string,
+    ...directories: string[]
+  ): Promise<Texture> {
+    const sources = await Texture.toBitmap(
+      directories
+        .map((directory) => [
+          `${directory}/px.png`,
+          `${directory}/nx.png`,
+          `${directory}/py.png`,
+          `${directory}/ny.png`,
+          `${directory}/pz.png`,
+          `${directory}/nz.png`,
+        ])
+        .flat()
+    );
+
+    return Texture.fromSources(
+      device,
+      label,
+      sources,
+      sources[0].width,
+      sources[0].height
+    );
+  }
 }
 
 export { Texture };

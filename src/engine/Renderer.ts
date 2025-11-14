@@ -197,13 +197,8 @@ class Renderer {
         },
         {
           binding: 5,
-          texture: {},
+          texture: { viewDimension: "cube-array" },
           visibility: GPUShaderStage.FRAGMENT,
-        },
-        {
-          binding: 6,
-          buffer: { type: "uniform" },
-          visibility: GPUShaderStage.VERTEX,
         },
       ],
     });
@@ -236,11 +231,9 @@ class Renderer {
         },
         {
           binding: 5,
-          resource: this.scenes.textureAtlas.texture,
-        },
-        {
-          binding: 6,
-          resource: { buffer: this.scenes.textureAtlasDataBuffer },
+          resource: this.scenes.textureArray.texture.createView({
+            dimension: "cube-array",
+          }),
         },
       ],
     });
@@ -257,7 +250,7 @@ class Renderer {
         module: shader.shader,
         buffers: [
           {
-            arrayStride: (3 + 3 + 2) * 4,
+            arrayStride: (3 + 3) * 4,
             attributes: [
               // position
               {
@@ -270,12 +263,6 @@ class Renderer {
                 shaderLocation: 1,
                 format: "float32x3",
                 offset: 3 * 4,
-              },
-              // uv
-              {
-                shaderLocation: 2,
-                format: "float32x2",
-                offset: (3 + 3) * 4,
               },
             ],
           },

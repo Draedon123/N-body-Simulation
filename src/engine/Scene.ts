@@ -1,23 +1,22 @@
 import { SingleObjectScene } from "./SingleObjectScene";
-import type { TextureAtlas } from "./TextureAtlas";
+import type { TextureArray } from "./TextureArray";
 
 class Scene {
   public readonly maxObjectsPerScene: Readonly<number[]>;
   public readonly maxScenes: number;
   /** do not reorder */
   public readonly scenes: SingleObjectScene[];
-  public readonly textureAtlas: TextureAtlas;
+  public readonly textureArray: TextureArray;
 
   public sceneBuffer!: GPUBuffer;
-  public textureAtlasDataBuffer!: GPUBuffer;
 
   private initialised: boolean;
   constructor(
-    textureAtlas: TextureAtlas,
+    textureArray: TextureArray,
     maxScenes: number,
     maxObjectsPerScene: number[] | number = 128
   ) {
-    this.textureAtlas = textureAtlas;
+    this.textureArray = textureArray;
     this.maxObjectsPerScene =
       typeof maxObjectsPerScene === "number"
         ? new Array(maxScenes).fill(0).map(() => maxObjectsPerScene)
@@ -63,23 +62,6 @@ class Scene {
         SingleObjectScene.objectByteLength,
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
-
-    this.textureAtlasDataBuffer = device.createBuffer({
-      label: "Texture Atlas Data Buffer",
-      size: 4 * 4,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
-
-    device.queue.writeBuffer(
-      this.textureAtlasDataBuffer,
-      0,
-      new Uint32Array([
-        this.textureAtlas.texture.width,
-        this.textureAtlas.texture.height,
-        this.textureAtlas.columns,
-        this.textureAtlas.rows,
-      ])
-    );
 
     for (const scene of this.scenes) {
       scene.initialise(this, device);

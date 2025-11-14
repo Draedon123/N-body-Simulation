@@ -66,7 +66,6 @@ class Cube extends Mesh {
         vertices.push({
           position,
           normal: direction,
-          uv: [u / resolution, v / resolution],
         });
 
         if (u < resolution && v < resolution) {
