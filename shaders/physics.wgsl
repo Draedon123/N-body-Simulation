@@ -31,6 +31,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     if(i == index){
       continue;
     }
+    
     let bodyPosition: vec3f = extractPosition(&objects[i].modelMatrix);
     let toBody: vec3f = bodyPosition - position;
     let collisionNormal = normalize(toBody);
@@ -76,6 +77,10 @@ fn derivative(derivativeFunction: u32, index: u32, t: f32, state: vec3f) -> vec3
       return vec3f(0.0);
     }
   }
+}
+
+fn extractPosition(modelMatrix: ptr<storage, mat4x4f, read_write>) -> vec3f {
+  return modelMatrix[3].xyz;
 }
 
 fn setPosition(modelMatrix: ptr<storage, mat4x4f, read_write>, position: vec3f) {
