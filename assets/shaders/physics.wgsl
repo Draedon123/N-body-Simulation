@@ -32,7 +32,6 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     if(i == index){
       continue;
     }
-
     let bodyPosition: vec3f = extractPosition(&objects[i].modelMatrix);
     let toBody: vec3f = bodyPosition - position;
     let collisionNormal = normalize(toBody);
@@ -40,7 +39,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     let radiusSum: f32 = bodies[i].radius + bodies[index].radius;
 
     if(distanceBetweenCentres - radiusSum <= 0.0){
-      bodies[index].velocity -= (1.0 + RESTITUTION) * collisionNormal * max(0.0, dot(collisionNormal, bodies[index].velocity));
+      bodies[index].velocity -= (1.0 + RESTITUTION) * 2.0 * bodies[i].mass / (bodies[index].mass + bodies[i].mass) * collisionNormal * max(0.0, dot(collisionNormal, bodies[index].velocity));
       position = bodyPosition - collisionNormal * radiusSum;
 
       break;
