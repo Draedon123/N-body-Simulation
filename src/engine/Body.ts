@@ -12,7 +12,7 @@ class Body extends Model {
     position: Vector3,
     radius: number,
     mass: number,
-    initialVelocity: Vector3 = new Vector3(0, 0, 0)
+    initialVelocity: Vector3
   ) {
     super({
       position,

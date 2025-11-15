@@ -91,6 +91,6 @@ fn truncationError(
   let error: vec3f = TE1 * k1 + TE2 * k2 + TE3 * k3 + TE4 * k4 + TE5 * k5 + TE6 * k6;
   let scaled: vec3f = error / scale;
 
-  // RMS
+  // RMSE
   return length(scaled) * SQRT_THIRD;
 }

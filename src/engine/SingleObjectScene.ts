@@ -64,7 +64,7 @@ class SingleObjectScene {
 
       bufferWriter.writeMat4x4f(object.calculateModelMatrix());
       bufferWriter.writeUint32(object.textureID);
-      bufferWriter.pad(12);
+      bufferWriter.pad(3 * 4);
     }
 
     this.device.queue.writeBuffer(
@@ -150,7 +150,7 @@ class SingleObjectScene {
   }
 
   public static get objectByteLength(): number {
-    return (16 + 4 + 12) * 4;
+    return (16 + 4) * 4;
   }
 }
 

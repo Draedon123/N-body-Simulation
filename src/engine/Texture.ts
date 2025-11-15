@@ -46,16 +46,15 @@ class Texture {
     return new Texture(label, texture);
   }
 
-  protected static async toBitmap(urls: string[]): Promise<ImageBitmap[]> {
+  protected static toBitmap(urls: string[]): Promise<ImageBitmap[]> {
     const requests = urls.map(
-      async (url) => await (await fetch(resolveBasePath(url))).blob()
-    );
-    const blobs = await Promise.all(requests);
-    const bitmaps = await Promise.all(
-      blobs.map((blob) => createImageBitmap(blob))
+      async (url) =>
+        await createImageBitmap(
+          await (await fetch(resolveBasePath(url))).blob()
+        )
     );
 
-    return bitmaps;
+    return Promise.all(requests);
   }
 
   public static async create(
@@ -74,12 +73,12 @@ class Texture {
     );
   }
 
-  public static async createCubemap(
+  public static createCubemap(
     device: GPUDevice,
     label: string,
     textureDirectory: string
   ): Promise<Texture> {
-    return await Texture.create(
+    return Texture.create(
       device,
       label,
       `${textureDirectory}/px.png`,
@@ -88,33 +87,6 @@ class Texture {
       `${textureDirectory}/ny.png`,
       `${textureDirectory}/pz.png`,
       `${textureDirectory}/nz.png`
-    );
-  }
-
-  public static async createCubeArray(
-    device: GPUDevice,
-    label: string,
-    ...directories: string[]
-  ): Promise<Texture> {
-    const sources = await Texture.toBitmap(
-      directories
-        .map((directory) => [
-          `${directory}/px.png`,
-          `${directory}/nx.png`,
-          `${directory}/py.png`,
-          `${directory}/ny.png`,
-          `${directory}/pz.png`,
-          `${directory}/nz.png`,
-        ])
-        .flat()
-    );
-
-    return Texture.fromSources(
-      device,
-      label,
-      sources,
-      sources[0].width,
-      sources[0].height
     );
   }
 }

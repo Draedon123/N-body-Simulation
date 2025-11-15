@@ -9,7 +9,7 @@ struct VertexOutput {
 
 @group(0) @binding(0) var textureSampler: sampler;
 @group(0) @binding(1) var texture: texture_cube<f32>;
-@group(0) @binding(2) var<uniform> inversePerspectiveViewMatrix: mat4x4f;
+@group(0) @binding(2) var <uniform> inversePerspectiveViewMatrix: mat4x4f;
 
 const VERTICES: array<vec2f, 3> = array(
   vec2f(-1.0,  3.0),

@@ -98,14 +98,6 @@ class Mesh {
     }
   }
 
-  public render(renderPass: GPURenderPassEncoder): void {
-    if (this.indexBuffer !== null) {
-      renderPass.drawIndexed(this.indexCount);
-    } else {
-      renderPass.draw(this.rawVertices.length);
-    }
-  }
-
   public bind(
     renderPass: GPURenderPassEncoder,
     vertexBufferSlot: number = 0

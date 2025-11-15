@@ -19,7 +19,7 @@ class Scene {
     this.textureArray = textureArray;
     this.maxObjectsPerScene =
       typeof maxObjectsPerScene === "number"
-        ? new Array(maxScenes).fill(0).map(() => maxObjectsPerScene)
+        ? Array.from({ length: maxScenes }, () => maxObjectsPerScene)
         : Array.from(
             { length: maxScenes },
             (_, i) => maxObjectsPerScene[i] ?? 128

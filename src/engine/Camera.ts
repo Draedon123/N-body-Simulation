@@ -136,14 +136,6 @@ class Camera {
     });
   }
 
-  public get fovDegrees(): number {
-    return degrees(this.fovRadians);
-  }
-
-  public set fovDegrees(degrees: number) {
-    this.fovRadians = radians(degrees);
-  }
-
   public getPerspectiveMatrix(): Matrix4 {
     return Matrix4.perspective(
       this.fovRadians,

@@ -70,9 +70,11 @@ function initialiseSlider(
     const processValue: SliderOptions["processValue"] =
       options.processValue ?? ((value) => value);
     const processText: SliderTextProcess =
-      "processText" in options
-        ? (options.processText ?? ((value) => `(${value.toString()})`))
-        : (value) => `(${value.toFixed(1)})`;
+      "processText" in options && options.processText !== undefined
+        ? options.processText
+        : "decimalPlaces" in options
+          ? (value) => `(${value.toFixed(options.decimalPlaces)})`
+          : (value) => `(${value.toString()})`;
     const value = processValue(parseFloat(slider.value));
     valueDisplay.textContent = processText(value);
 

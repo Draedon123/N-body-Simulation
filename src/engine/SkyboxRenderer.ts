@@ -83,13 +83,6 @@ class SkyboxRenderer {
         format: "depth24plus",
       },
     });
-
-    for (let i = 0, skyboxes = this.skyboxes.length; i < skyboxes; i++) {
-      const skybox = this.skyboxes[i];
-
-      this.skyboxes.splice(0, 1);
-      this.addSkybox(skybox);
-    }
   }
 
   public static async create(
@@ -148,7 +141,7 @@ class SkyboxRenderer {
       this.addSkybox(skybox);
     }
 
-    const skyboxIndex = this.skyboxes.findIndex((box) => box === skybox);
+    const skyboxIndex = this.skyboxes.indexOf(skybox);
     this.activeSkybox = skyboxIndex;
   }
 

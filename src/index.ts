@@ -42,23 +42,26 @@ async function main(): Promise<void> {
   });
 }
 
-main();
-// main().catch((error) => {
-//   const errorMessage =
-//     error instanceof Error ? error.message : JSON.stringify(error);
-//   const iframe = document.querySelector("iframe") as HTMLIFrameElement;
-//   const errorElement = document.getElementById("message") as HTMLElement;
+if (import.meta.env.DEV) {
+  main();
+} else {
+  main().catch((error) => {
+    const errorMessage =
+      error instanceof Error ? error.message : JSON.stringify(error);
+    const iframe = document.querySelector("iframe") as HTMLIFrameElement;
+    const errorElement = document.getElementById("message") as HTMLElement;
 
-//   errorElement.classList.add("error");
-//   errorElement.textContent = errorMessage;
-//   iframe.classList.remove("hidden");
-//   // iframe.src = "https://www.youtube.com/embed/PLACEHOLDER";
+    errorElement.classList.add("error");
+    errorElement.textContent = errorMessage;
+    iframe.classList.remove("hidden");
+    // iframe.src = "https://www.youtube.com/embed/PLACEHOLDER";
 
-//   const chevron = document.getElementById("chevron");
-//   const panel = document.getElementById("content");
+    const chevron = document.getElementById("chevron");
+    const panel = document.getElementById("content");
 
-//   chevron?.classList.add("collapsed");
-//   panel?.classList.add("collapsed");
+    chevron?.classList.add("collapsed");
+    panel?.classList.add("collapsed");
 
-//   console.error(errorMessage);
-// });
+    console.error(errorMessage);
+  });
+}

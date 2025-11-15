@@ -67,7 +67,7 @@ class PhysicsShader {
 
     this.device.queue.writeBuffer(this.bodyStatesBuffer, 0, bodyStates.buffer);
 
-    const mainBindGroupLayout = device.createBindGroupLayout({
+    const bindGroupLayout = device.createBindGroupLayout({
       label: "Physics Shader Bind Group Layout",
       entries: [
         {
@@ -90,7 +90,7 @@ class PhysicsShader {
 
     this.bindGroup = device.createBindGroup({
       label: "Physics Shader Bind Group",
-      layout: mainBindGroupLayout,
+      layout: bindGroupLayout,
       entries: [
         {
           binding: 0,
@@ -109,7 +109,7 @@ class PhysicsShader {
 
     const pipelineLayout = device.createPipelineLayout({
       label: "Physics Shader Compute Pipeline Layout",
-      bindGroupLayouts: [mainBindGroupLayout],
+      bindGroupLayouts: [bindGroupLayout],
     });
 
     this.computePipeline = device.createComputePipeline({

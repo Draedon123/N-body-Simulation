@@ -69,19 +69,19 @@ class NBodySimulation {
         const mass = 1e13 * scale;
         const radius = this.bodyRadius * scale;
         const body = new Body(position, radius, mass, velocity);
-        body.textureID = this.scene?.textureArray.random() ?? 0;
 
+        body.textureID = this.scene?.textureArray.random() ?? 0;
         this.bodies.push(body);
       }
 
       this.bodyScene.addObjects(this.bodies.slice(this.bodyCount));
+      this.bodyScene.updateBuffer(delta);
     } else {
       const deleted = this.bodies.splice(count, -delta);
       this.bodyScene.removeObjects(deleted);
     }
 
     this._bodyCount = count;
-    this.bodyScene.updateBuffer();
   }
 
   public tick(deltaTimeMs: number): void {

@@ -98,20 +98,16 @@ class Renderer {
 
     await this.initialiseRendering();
 
-    const bufferWriter = new BufferWriter(this.scenes.maxScenes * 256);
+    const parameters = new BufferWriter(this.scenes.maxScenes * 256);
 
     for (let i = 0; i < this.scenes.maxObjectsPerScene.length; i++) {
       const maxObjects = this.scenes.maxObjectsPerScene[i - 1] ?? 0;
 
-      bufferWriter.writeUint32(maxObjects);
-      bufferWriter.pad(256 - 4);
+      parameters.writeUint32(maxObjects);
+      parameters.pad(256 - 4);
     }
 
-    this.device.queue.writeBuffer(
-      this.parametersBuffer,
-      0,
-      bufferWriter.buffer
-    );
+    this.device.queue.writeBuffer(this.parametersBuffer, 0, parameters.buffer);
 
     new ResizeObserver((entries) => {
       const canvas = entries[0];

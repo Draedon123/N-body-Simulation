@@ -6,7 +6,7 @@ class Sphere extends Cube {
     super(resolution, radius * 2);
 
     this.rawVertices.forEach((vertex) => {
-      vertex.position.normalise().scale(0.5 * radius * 2);
+      vertex.position.normalise().scale(radius);
 
       const normal = Vector3.normalise(vertex.position);
 

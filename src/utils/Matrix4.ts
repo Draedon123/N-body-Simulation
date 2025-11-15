@@ -85,6 +85,7 @@ class Matrix4 {
   ): Matrix4 {
     const matrix = new Matrix4();
     const f = 1.0 / Math.tan(fieldOfViewRadians / 2);
+
     matrix.components[0] = f / aspectRatio;
     matrix.components[5] = f;
     matrix.components[11] = -1;
@@ -136,7 +137,7 @@ class Matrix4 {
     z1 = positionY - lookAtY;
     z2 = positionZ - lookAtZ;
 
-    length = 1 / Math.sqrt(z0 * z0 + z1 * z1 + z2 * z2);
+    length = 1 / Math.hypot(z0, z1, z2);
     z0 *= length;
     z1 *= length;
     z2 *= length;
@@ -144,7 +145,7 @@ class Matrix4 {
     x0 = upY * z2 - upZ * z1;
     x1 = upZ * z0 - upX * z2;
     x2 = upX * z1 - upY * z0;
-    length = Math.sqrt(x0 * x0 + x1 * x1 + x2 * x2);
+    length = Math.hypot(x0, x1, x2);
     if (!length) {
       x0 = 0;
       x1 = 0;
@@ -160,7 +161,7 @@ class Matrix4 {
     y1 = z2 * x0 - z0 * x2;
     y2 = z0 * x1 - z1 * x0;
 
-    length = Math.sqrt(y0 * y0 + y1 * y1 + y2 * y2);
+    length = Math.hypot(y0, y1, y2);
     if (!length) {
       y0 = 0;
       y1 = 0;
