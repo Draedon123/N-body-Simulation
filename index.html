@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>N-body Simulation</title>
-    <script type="module" crossorigin src="/N-body-Simulation/assets/index-BF0U78Kx.js"></script>
+    <script type="module" crossorigin src="/N-body-Simulation/assets/index-0qy0XzIM.js"></script>
     <link rel="stylesheet" crossorigin href="/N-body-Simulation/assets/index-M80NwL3r.css">
   </head>
   <body>
@@ -40,11 +40,26 @@
           <span id="bodyCountValue">(50)</span>
           <input
             type="range"
-            name="bodyCounInputt"
+            name="bodyCountInput"
             id="bodyCountInput"
             value="50"
             min="1"
             max="128"
+            step="1"
+          />
+        </label>
+
+        <label for="restitutionInput">
+          <span>Bounciness (Restitution)</span>
+          <span id="restitutionValue">(1.0)</span>
+          <input
+            type="range"
+            name="restitutionInput"
+            id="restitutionInput"
+            value="50"
+            min="0"
+            max="1"
+            step="0.1"
           />
         </label>
       </div>

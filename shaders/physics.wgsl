@@ -12,7 +12,6 @@ struct BodyState {
 @group(0) @binding(2) var <storage, read_write> bodies: array<BodyState>;
 
 const G: f32 = 6.6743e-11;
-const RESTITUTION: f32 = 1.0;
 
 @compute
 @workgroup_size(64, 1, 1)
@@ -32,7 +31,6 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     if(i == index){
       continue;
     }
-
     let bodyPosition: vec3f = extractPosition(&objects[i].modelMatrix);
     let toBody: vec3f = bodyPosition - position;
     let collisionNormal = normalize(toBody);
@@ -40,7 +38,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     let radiusSum: f32 = bodies[i].radius + bodies[index].radius;
 
     if(distanceBetweenCentres - radiusSum <= 0.0){
-      bodies[index].velocity -= (1.0 + RESTITUTION) * collisionNormal * max(0.0, dot(collisionNormal, bodies[index].velocity));
+      bodies[index].velocity -= (1.0 + settings.restitution) * 2.0 * bodies[i].mass / (bodies[index].mass + bodies[i].mass) * collisionNormal * max(0.0, dot(collisionNormal, bodies[index].velocity));
       position = bodyPosition - collisionNormal * radiusSum;
 
       break;
