@@ -1,20 +1,34 @@
 import type { NBodySimulation } from "./engine/NBodySimulation";
 
+type SliderOptions = {
+  onChange: (value: number) => unknown;
+  processValue: (value: number) => number;
+} & (
+  | {
+      processText: SliderTextProcess;
+    }
+  | {
+      decimalPlaces: number;
+    }
+);
+
+type SliderTextProcess = (value: number) => string;
+
 function initialiseConfigPanel(simulation: NBodySimulation): void {
   initialiseChevron();
 
-  initialiseSlider("bodyCount", (count) => {
-    simulation.bodyCount = count;
+  initialiseSlider("bodyCount", {
+    onChange: (count) => {
+      simulation.bodyCount = count;
+    },
   });
 
-  initialiseSlider(
-    "restitution",
-    (restitution) => {
+  initialiseSlider("restitution", {
+    onChange: (restitution) => {
       simulation.physicsShader.restitution = restitution;
     },
-    undefined,
-    (restitution) => `(${restitution.toFixed(1)})`
-  );
+    decimalPlaces: 1,
+  });
 }
 
 function initialiseChevron(): void {
@@ -37,9 +51,7 @@ function initialiseChevron(): void {
 
 function initialiseSlider(
   id: string,
-  onChange: (value: number) => unknown,
-  processValue: (value: number) => number = (value) => value,
-  processText: (value: number) => string = (value) => `(${value.toString()})`
+  options: Partial<SliderOptions> = {}
 ): void {
   const sliderID = `${id}Input`;
   const valueDisplayID = `${id}Value`;
@@ -55,10 +67,16 @@ function initialiseSlider(
   }
 
   slider.addEventListener("change", () => {
+    const processValue: SliderOptions["processValue"] =
+      options.processValue ?? ((value) => value);
+    const processText: SliderTextProcess =
+      "processText" in options
+        ? (options.processText ?? ((value) => `(${value.toString()})`))
+        : (value) => `(${value.toFixed(1)})`;
     const value = processValue(parseFloat(slider.value));
     valueDisplay.textContent = processText(value);
 
-    onChange(value);
+    options.onChange?.(value);
   });
 }
 
