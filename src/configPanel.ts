@@ -1,9 +1,11 @@
-import type { Renderer } from "./engine/Renderer";
+import type { NBodySimulation } from "./engine/NBodySimulation";
 
-// @ts-expect-error just a placeholder; wil be used later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function initialiseConfigPanel(renderer: Renderer): void {
+function initialiseConfigPanel(simulation: NBodySimulation): void {
   initialiseChevron();
+
+  initialiseSlider("bodyCount", (count) => {
+    simulation.bodyCount = count;
+  });
 }
 
 function initialiseChevron(): void {
@@ -21,6 +23,33 @@ function initialiseChevron(): void {
   chevron.addEventListener("click", () => {
     chevron.classList.toggle("collapsed");
     panel.classList.toggle("collapsed");
+  });
+}
+
+function initialiseSlider(
+  id: string,
+  onChange: (value: number) => unknown,
+  processValue: (value: number) => number = (value) => value,
+  processText: (value: number) => string = (value) => `(${value.toString()})`
+): void {
+  const sliderID = `${id}Input`;
+  const valueDisplayID = `${id}Value`;
+  const slider = document.getElementById(sliderID) as HTMLInputElement | null;
+  const valueDisplay = document.getElementById(valueDisplayID);
+
+  if (slider === null) {
+    throw new Error(`Could not find slider with id ${sliderID}`);
+  }
+
+  if (valueDisplay === null) {
+    throw new Error(`Could not find value display with id ${valueDisplay}`);
+  }
+
+  slider.addEventListener("change", () => {
+    const value = processValue(parseFloat(slider.value));
+    valueDisplay.textContent = processText(value);
+
+    onChange(value);
   });
 }
 

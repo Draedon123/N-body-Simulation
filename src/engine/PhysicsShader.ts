@@ -49,12 +49,12 @@ class PhysicsShader {
 
     this.bodyStatesBuffer = device.createBuffer({
       label: "Physics Shader Body States Buffer",
-      size: this.simulation.bodyCount * Body.BYTE_LENGTH,
+      size: this.simulation.maxBodies * Body.BYTE_LENGTH,
       usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
     });
 
     const bodyStates = new BufferWriter(
-      this.simulation.bodyCount * Body.BYTE_LENGTH
+      this.simulation.maxBodies * Body.BYTE_LENGTH
     );
 
     for (const body of this.simulation.bodies) {

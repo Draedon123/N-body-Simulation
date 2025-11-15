@@ -97,6 +97,22 @@ class SingleObjectScene {
     }
   }
 
+  public removeObjects(objects: Model[], updateDrawArgs: boolean = true): void {
+    for (const object of objects) {
+      const index = this.objects.indexOf(object);
+
+      if (index === -1) {
+        continue;
+      }
+
+      this.objects.splice(index, 1);
+    }
+
+    if (updateDrawArgs) {
+      this.updateDrawArgs();
+    }
+  }
+
   public updateDrawArgs(
     indexCount: number = this.mesh.indexCount,
     instanceCount: number = this.objectCount

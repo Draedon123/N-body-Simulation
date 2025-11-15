@@ -25,7 +25,7 @@ async function main(): Promise<void> {
   renderer.camera.position = new Vector3(30, 30, 30);
   renderer.camera.lookAt(new Vector3(0, 0, 0));
 
-  initialiseConfigPanel(renderer);
+  initialiseConfigPanel(simulation);
 
   const loop = new Loop({ wormholeThreshold: 100 });
   loop.addCallback((frame) => {

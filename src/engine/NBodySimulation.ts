@@ -5,23 +5,26 @@ import { Scene } from "./Scene";
 import { Vector3 } from "../utils/Vector3";
 import { Body } from "./Body";
 import { TextureArray } from "./TextureArray";
+import { clamp } from "../utils/clamp";
 
 type NBodyOptions = {
   bodyCount: number;
   bodyRadius: number;
   bodySpawnRadius: number;
+  maxBodies: number;
 };
 
 class NBodySimulation {
   public scene!: Scene;
 
-  public readonly bodyCount: number;
   public readonly bodies: Body[];
+  public readonly maxBodies: number;
 
   private readonly bodyScene: SingleObjectScene;
   private readonly bodyRadius: number;
   private readonly bodySpawnRadius: number;
 
+  private _bodyCount: number;
   private initialised: boolean;
 
   public physicsShader!: PhysicsShader;
@@ -29,42 +32,56 @@ class NBodySimulation {
     this.initialised = false;
 
     this.bodies = [];
-    this.bodyCount = options.bodyCount ?? 10;
     this.bodyRadius = options.bodyRadius ?? 1;
-    this.bodySpawnRadius =
-      options.bodySpawnRadius ?? 1.5 * this.bodyRadius * this.bodyCount;
+    this.maxBodies = options.maxBodies ?? 128;
 
     this.bodyScene = new SingleObjectScene(new Sphere(20, this.bodyRadius));
+    this._bodyCount = 0;
 
-    this.spawnBodies();
+    const bodyCount = options.bodyCount ?? 10;
+
+    this.bodySpawnRadius =
+      options.bodySpawnRadius ?? 1.5 * this.bodyRadius * bodyCount;
+    this.bodyCount = bodyCount;
   }
 
-  private spawnBodies(): void {
-    for (let i = 0; i < this.bodyCount; i++) {
-      let position = Vector3.random(
-        -this.bodySpawnRadius,
-        this.bodySpawnRadius
-      );
+  public get bodyCount(): number {
+    return this._bodyCount;
+  }
 
-      while (
-        this.bodies.some(
-          (body) =>
-            Vector3.subtract(body.position, position).magnitude <=
-            2 * this.bodyRadius
-        )
-      ) {
-        position = Vector3.random(-this.bodySpawnRadius, this.bodySpawnRadius);
-      }
+  public set bodyCount(count: number) {
+    count = clamp(count, 0, this.maxBodies);
 
-      const velocity = Vector3.random(-1, 1).scale(5 * this.bodyRadius);
-      const scale = 1 + 0.75 * Math.random();
-      const mass = 1e13 * scale;
-      const radius = this.bodyRadius * scale;
+    const delta = count - this.bodyCount;
 
-      this.bodies.push(new Body(position, radius, mass, velocity));
+    if (delta === 0) {
+      return;
     }
 
-    this.bodyScene.addObjects(this.bodies);
+    if (delta > 0) {
+      for (let i = 0; i < delta; i++) {
+        const position = Vector3.random(
+          -this.bodySpawnRadius,
+          this.bodySpawnRadius
+        );
+        const velocity = Vector3.random(-1, 1).scale(5 * this.bodyRadius);
+        const scale = 1 + 0.75 * Math.random();
+        const mass = 1e13 * scale;
+        const radius = this.bodyRadius * scale;
+        const body = new Body(position, radius, mass, velocity);
+        body.textureID = this.scene?.textureArray.random() ?? 0;
+
+        this.bodies.push(body);
+      }
+
+      this.bodyScene.addObjects(this.bodies.slice(this.bodyCount));
+    } else {
+      const deleted = this.bodies.splice(count, -delta);
+      this.bodyScene.removeObjects(deleted);
+    }
+
+    this._bodyCount = count;
+    this.bodyScene.updateBuffer();
   }
 
   public tick(deltaTimeMs: number): void {
@@ -102,7 +119,7 @@ class NBodySimulation {
         "Volcanic",
       ].map((name) => `textures/${name}`)
     );
-    this.scene = new Scene(textureArray, 1, this.bodyCount);
+    this.scene = new Scene(textureArray, 1, [this.maxBodies]);
 
     this.scene.initialise(device);
     this.physicsShader = await PhysicsShader.create(device, this);

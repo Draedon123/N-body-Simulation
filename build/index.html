@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>N-body Simulation</title>
-    <script type="module" crossorigin src="/N-body-Simulation/assets/index-DGNkAdBP.js"></script>
+    <script type="module" crossorigin src="/N-body-Simulation/assets/index-BF0U78Kx.js"></script>
     <link rel="stylesheet" crossorigin href="/N-body-Simulation/assets/index-M80NwL3r.css">
   </head>
   <body>
@@ -31,6 +31,22 @@
         Use WASD to move, Space to ascend, and Shift to descend
         <br />
         Mouse to rotate camera (click to lock cursor)
+
+        <br />
+        <br />
+
+        <label for="bodyCountInput">
+          <span>Number of Bodies</span>
+          <span id="bodyCountValue">(50)</span>
+          <input
+            type="range"
+            name="bodyCounInputt"
+            id="bodyCountInput"
+            value="50"
+            min="1"
+            max="128"
+          />
+        </label>
       </div>
     </div>
     <canvas id="main"></canvas>
