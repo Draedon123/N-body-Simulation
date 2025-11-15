@@ -7,7 +7,9 @@ import type { NBodySimulation } from "./NBodySimulation";
 import { Shader } from "./Shader";
 
 class PhysicsShader {
-  private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(2 * 4, 16);
+  private static readonly SETTINGS_BYTE_LENGTH: number = roundUp(3 * 4, 16);
+
+  public restitution: number;
 
   private readonly simulation: NBodySimulation;
   private readonly device: GPUDevice;
@@ -40,6 +42,8 @@ class PhysicsShader {
 
       frameTimeElement.textContent = frameTime;
     });
+
+    this.restitution = 1;
 
     this.settingsBuffer = device.createBuffer({
       label: "Physics Shader Settings Buffer",
@@ -122,6 +126,7 @@ class PhysicsShader {
 
     settings.writeUint32(this.simulation.bodyCount);
     settings.writeFloat32(deltaTimeMs);
+    settings.writeFloat32(this.restitution);
 
     this.device.queue.writeBuffer(this.settingsBuffer, 0, settings.buffer);
   }

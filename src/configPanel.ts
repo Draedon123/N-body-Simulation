@@ -6,6 +6,15 @@ function initialiseConfigPanel(simulation: NBodySimulation): void {
   initialiseSlider("bodyCount", (count) => {
     simulation.bodyCount = count;
   });
+
+  initialiseSlider(
+    "restitution",
+    (restitution) => {
+      simulation.physicsShader.restitution = restitution;
+    },
+    undefined,
+    (restitution) => `(${restitution.toFixed(1)})`
+  );
 }
 
 function initialiseChevron(): void {
