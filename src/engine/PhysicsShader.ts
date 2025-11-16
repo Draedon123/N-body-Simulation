@@ -28,20 +28,26 @@ class PhysicsShader {
     const frameTimeElement = document.getElementById(
       "computeFrameTime"
     ) as HTMLElement;
+    const fpsElement = document.getElementById("fps") as HTMLElement;
 
-    this.gpuTimer = new GPUTimer(device, (time) => {
-      const microseconds = time / 1e3;
-      const milliseconds = time / 1e6;
-      const useMilliseconds = milliseconds > 1;
-      const displayTime = (
-        useMilliseconds ? milliseconds : microseconds
-      ).toFixed(2);
-      const prefix = useMilliseconds ? "ms" : "μs";
+    this.gpuTimer = new GPUTimer(
+      device,
+      (time, totalTime) => {
+        const microseconds = time / 1e3;
+        const milliseconds = time / 1e6;
+        const useMilliseconds = milliseconds > 1;
+        const displayTime = (
+          useMilliseconds ? milliseconds : microseconds
+        ).toFixed(2);
+        const prefix = useMilliseconds ? "ms" : "μs";
+        const fps = 1 / ((time + totalTime) * 1e-9);
+        const frameTime = displayTime + prefix;
 
-      const frameTime = displayTime + prefix;
-
-      frameTimeElement.textContent = frameTime;
-    });
+        frameTimeElement.textContent = frameTime;
+        fpsElement.textContent = fps.toFixed(2);
+      },
+      0
+    );
 
     this.restitution = 1;
 

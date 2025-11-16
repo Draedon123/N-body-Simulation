@@ -55,20 +55,23 @@ class Renderer {
       "renderFrameTime"
     ) as HTMLElement;
     const fpsElement = document.getElementById("fps") as HTMLElement;
-    this.gpuTimer = new GPUTimer(this.device, (time) => {
-      const microseconds = time / 1e3;
-      const milliseconds = time / 1e6;
-      const seconds = time / 1e9;
-      const useMilliseconds = milliseconds > 1;
-      const displayTime = (
-        useMilliseconds ? milliseconds : microseconds
-      ).toFixed(2);
-      const prefix = useMilliseconds ? "ms" : "μs";
-      const fps = 1 / seconds;
+    this.gpuTimer = new GPUTimer(
+      this.device,
+      (time, totalTime) => {
+        const microseconds = time / 1e3;
+        const milliseconds = time / 1e6;
+        const useMilliseconds = milliseconds > 1;
+        const displayTime = (
+          useMilliseconds ? milliseconds : microseconds
+        ).toFixed(2);
+        const prefix = useMilliseconds ? "ms" : "μs";
+        const fps = 1 / ((time + totalTime) * 1e-9);
 
-      frameTimeElement.textContent = displayTime + prefix;
-      fpsElement.textContent = fps.toFixed(2);
-    });
+        frameTimeElement.textContent = displayTime + prefix;
+        fpsElement.textContent = fps.toFixed(2);
+      },
+      0
+    );
 
     if (!this.gpuTimer.canTimestamp) {
       frameTimeElement.textContent = "[Not supported by browser]";

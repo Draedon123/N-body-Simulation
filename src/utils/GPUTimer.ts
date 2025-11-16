@@ -1,8 +1,10 @@
 import { RollingAverage } from "./RollingAverage";
 
-type GPUTimerOnUpdate = (time: number) => unknown;
+type GPUTimerOnUpdate = (time: number, linkedTimerSum: number) => unknown;
 
 class GPUTimer {
+  private static readonly linkedTimers: Record<number, GPUTimer[]> = {};
+
   public readonly canTimestamp: boolean;
 
   private readonly querySet!: GPUQuerySet;
@@ -13,7 +15,11 @@ class GPUTimer {
 
   public onUpdate: GPUTimerOnUpdate;
 
-  constructor(device: GPUDevice, onUpdate: GPUTimerOnUpdate = () => {}) {
+  constructor(
+    device: GPUDevice,
+    onUpdate: GPUTimerOnUpdate = () => {},
+    link: number | null = null
+  ) {
     this.canTimestamp = device.features.has("timestamp-query");
     this.onUpdate = onUpdate;
     this.rollingAverage = new RollingAverage(50);
@@ -57,10 +63,27 @@ class GPUTimer {
           this.rollingAverage.addSample(Number(times[1] - times[0]));
           this.resultBuffer.unmap();
 
-          this.onUpdate(this.rollingAverage.average);
+          const time = this.rollingAverage.average;
+          const linkedTimerSum =
+            link === null
+              ? time
+              : GPUTimer.linkedTimers[link].reduce(
+                  (total, current) => total + current.time,
+                  0
+                );
+
+          this.onUpdate(time, linkedTimerSum);
         });
       });
     };
+
+    if (link !== null) {
+      if (!(link in GPUTimer.linkedTimers)) {
+        GPUTimer.linkedTimers[link] = [];
+      }
+
+      GPUTimer.linkedTimers[link].push(this);
+    }
   }
 
   public get time(): number {
