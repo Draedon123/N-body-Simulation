@@ -53,6 +53,7 @@ fn rkf45(initial: vec3f, t0: f32, tn: f32, atol: vec3f, rtol: vec3f, index: u32,
   var stepSize: f32 = (tn - t0) / 100.0;
   var t: f32 = t0;
   var y: vec3f = initial;
+  var facMax: f32 = FAC_MAX;
 
   let minStepSize: f32 = 1e-12 * abs(tn - t0);
 
@@ -71,11 +72,14 @@ fn rkf45(initial: vec3f, t0: f32, tn: f32, atol: vec3f, rtol: vec3f, index: u32,
     let newY: vec3f = y + stepSize * (C1H * k1 + C2H * k2 + C3H * k3 + C4H * k4 + C5H * k5 + C6H * k6);
     let error: f32 = truncationError(k1, k2, k3, k4, k5, k6, atol, rtol, y, newY);
 
-    stepSize = max(stepSize * clamp(FAC * pow(error, -0.2), FAC_MIN, FAC_MAX), minStepSize);
+    stepSize = max(stepSize * clamp(FAC * pow(error, -0.2), FAC_MIN, facMax), minStepSize);
 
     if(error <= 1.0){
       y = newY;
       t += stepSize;
+      facMax = FAC_MAX;
+    } else {
+      facMax = 1.0;
     }
   }
 
