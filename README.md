@@ -1,8 +1,8 @@
-<!-- ![Banner](banner.png) -->
+![Banner](banner.png)
 
 # N-body Simulation
 
-A simulation of the n-body problem
+A simulation of the N-Body problem
 
 # References
 

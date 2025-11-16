@@ -54,7 +54,7 @@ if (import.meta.env.DEV) {
     errorElement.classList.add("error");
     errorElement.textContent = errorMessage;
     iframe.classList.remove("hidden");
-    // iframe.src = "https://www.youtube.com/embed/PLACEHOLDER";
+    iframe.src = "https://www.youtube.com/embed/8VcjUIe-zE4";
 
     const chevron = document.getElementById("chevron");
     const panel = document.getElementById("content");
