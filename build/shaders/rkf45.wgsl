@@ -49,13 +49,25 @@ const FAC_MAX: f32 = 3.0;
 const SQRT_THIRD: f32 = sqrt(1.0 / 3.0);
 
 // numerically integrates from t0 to tn
-fn rkf45(initial: vec3f, t0: f32, tn: f32, atol: vec3f, rtol: vec3f, index: u32, derivativeFunction: u32) -> vec3f {
+fn rkf45(y0: vec3f, t0: f32, tn: f32, atol: vec3f, rtol: vec3f, index: u32, derivativeFunction: u32) -> vec3f {
+  // let inverseScale: vec3f = 1.0 / (atol + abs(y0) * rtol);
+  // let f0: vec3f = derivative(derivativeFunction, index, t0, y0);
+  // // RMS
+  // let d0: f32 = length(y0 * inverseScale) * SQRT_THIRD;
+  // let d1: f32 = length(f0 * inverseScale) * SQRT_THIRD;
+
+  // let h0: f32 = select(0.01 * (d0 / d1), 1e-6, max(d0, d1) < 1e-5);
+  // let y1: vec3f = y0 + h0 * f0;
+  // let f1: vec3f = derivative(derivativeFunction, index, t0 + h0, y1);
+  // let d2: f32 = length((f1 - f0) * inverseScale) * SQRT_THIRD / h0;
+  // let h1: f32 = select(pow(0.01 / max(d1, d2), 0.2), max(1e-6, h0 * 1e-3), max(d1, d2) <= 1e-15);
+
+  // var stepSize: f32 = min(100 * h0, h1);
+
   var stepSize: f32 = (tn - t0) / 100.0;
   var t: f32 = t0;
-  var y: vec3f = initial;
+  var y: vec3f = y0;
   var facMax: f32 = FAC_MAX;
-
-  let minStepSize: f32 = 1e-12 * abs(tn - t0);
 
   while(t < tn){
     if(t + stepSize > tn){
@@ -72,7 +84,7 @@ fn rkf45(initial: vec3f, t0: f32, tn: f32, atol: vec3f, rtol: vec3f, index: u32,
     let newY: vec3f = y + stepSize * (C1H * k1 + C2H * k2 + C3H * k3 + C4H * k4 + C5H * k5 + C6H * k6);
     let error: f32 = truncationError(k1, k2, k3, k4, k5, k6, atol, rtol, y, newY);
 
-    stepSize = max(stepSize * clamp(FAC * pow(error, -0.2), FAC_MIN, facMax), minStepSize);
+    stepSize *= clamp(FAC * pow(error, -0.2), FAC_MIN, facMax);
 
     if(error <= 1.0){
       y = newY;

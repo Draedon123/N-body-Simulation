@@ -49,7 +49,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   setPosition(&objects[index].modelMatrix, position);
 }
 
-fn derivative(derivativeFunction: u32, index: u32, t: f32, state: vec3f) -> vec3f {
+fn derivative(derivativeFunction: u32, index: u32, t: f32, y: vec3f) -> vec3f {
   switch(derivativeFunction){
     // dx/dt = v
     case 0: {

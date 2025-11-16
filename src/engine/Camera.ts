@@ -126,6 +126,10 @@ class Camera {
     this.keyboardManager.addEventListeners();
 
     document.addEventListener("mousemove", (event) => {
+      if (document.pointerLockElement === null) {
+        return;
+      }
+
       const deltaX = event.movementX * this.mouseSensitivity;
       const deltaY = -event.movementY * this.mouseSensitivity;
 
